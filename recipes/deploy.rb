@@ -20,6 +20,8 @@ node[:deploy].each do |application, deploy|
     command "#{deploy[:bundler_binary]} binstubs whenever"
   end
 
+  Chef::Log.info("cron_node: #{cron_node}")
+  Chef::Log.info("hostname: #{node[:opsworks][:instance][:hostname]}")
   if cron_node && cron_node[:hostname] == node[:opsworks][:instance][:hostname] # I'm special!
     Chef::Log.info("Assuming cron_node role")
     # cron
