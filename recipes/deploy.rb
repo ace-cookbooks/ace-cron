@@ -4,8 +4,14 @@ node[:deploy].each do |application, deploy|
     next
   end
 
-  cron_node = node[:opsworks][:layers]['workers'][:instances].keys.sort.first
-  Chef::Log.debug("Elected #{cron_node} as cron_node")
+  cron_node_key = node[:opsworks][:layers]['workers'][:instances].keys.sort.first
+  cron_node = node[:opsworks][:layers]['workers'][:instances][cron_node_key]
+  if cron_node.nil?
+    cron_node = node[:opsworks][:instance]
+    Chef::Log.debug("Elected self as cron_node")
+  else
+    Chef::Log.debug("Elected #{cron_node_key} as cron_node")
+  end
 
   execute 'bundle binstubs whenever' do
     user deploy[:user]
