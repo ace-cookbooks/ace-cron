@@ -7,10 +7,9 @@ node[:deploy].each do |application, deploy|
   cron_node_key = node[:opsworks][:layers]['workers'][:instances].keys.sort.first
   cron_node = node[:opsworks][:layers]['workers'][:instances][cron_node_key]
   if cron_node.nil?
-    cron_node = node[:opsworks][:instance]
-    Chef::Log.debug("Elected self as cron_node")
+    Chef::Log.info("No cron_node elected")
   else
-    Chef::Log.debug("Elected #{cron_node_key} as cron_node")
+    Chef::Log.info("Elected #{cron_node_key} as cron_node")
   end
 
   execute 'bundle binstubs whenever' do
@@ -21,8 +20,8 @@ node[:deploy].each do |application, deploy|
     command "#{deploy[:bundler_binary]} binstubs whenever"
   end
 
-  if cron_node[:hostname] == node[:opsworks][:instance][:hostname] # I'm special!
-    Chef::Log.debug("Assuming cron_node role")
+  if cron_node && cron_node[:hostname] == node[:opsworks][:instance][:hostname] # I'm special!
+    Chef::Log.info("Assuming cron_node role")
     # cron
     execute 'bundle exec whenever -w' do
       user deploy[:user]
@@ -32,7 +31,7 @@ node[:deploy].each do |application, deploy|
       command "#{deploy[:bundler_binary]} exec whenever -w"
     end
   else
-    Chef::Log.debug("Not the cron_node: Removing deploy's crontab")
+    Chef::Log.info("Not the cron_node: Removing deploy's crontab")
     # delete cron
     execute 'bundle exec whenever -c' do
       user deploy[:user]
