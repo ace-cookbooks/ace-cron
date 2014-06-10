@@ -12,11 +12,12 @@ node[:deploy].each do |application, deploy|
     command "#{deploy[:bundler_binary]} binstubs whenever"
   end
 
-  execute 'bundle exec whenever -w' do
+  # delete cron
+  execute 'bundle exec whenever -c' do
     user deploy[:user]
     group deploy[:group]
     environment(deploy[:environment])
     cwd deploy[:current_path]
-    command "#{deploy[:bundler_binary]} exec whenever -w"
+    command "#{deploy[:bundler_binary]} exec whenever -c"
   end
 end

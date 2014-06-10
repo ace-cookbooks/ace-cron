@@ -4,7 +4,13 @@ node[:deploy].each do |application, deploy|
     next
   end
 
-  cron_node = node[:opsworks][:layers]['workers'][:instances].keys.sort.first
+  cron_layer = node['ace-cron'][:cron_layer]
+  if cron_layer.nil?
+    Chef::Log.warn('No cron layer specified')
+    next
+  end
+
+  cron_node = node[:opsworks][:layers][cron_layer][:instances].keys.sort.first
   if cron_node.nil?
     Chef::Log.info("No cron_node elected")
   else
