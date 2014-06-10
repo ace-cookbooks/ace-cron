@@ -4,12 +4,11 @@ node[:deploy].each do |application, deploy|
     next
   end
 
-  cron_node_key = node[:opsworks][:layers]['workers'][:instances].keys.sort.first
-  cron_node = node[:opsworks][:layers]['workers'][:instances][cron_node_key]
+  cron_node = node[:opsworks][:layers]['workers'][:instances].keys.sort.first
   if cron_node.nil?
     Chef::Log.info("No cron_node elected")
   else
-    Chef::Log.info("Elected #{cron_node_key} as cron_node")
+    Chef::Log.info("Elected #{cron_node} as cron_node")
   end
 
   execute 'bundle binstubs whenever' do
@@ -22,7 +21,7 @@ node[:deploy].each do |application, deploy|
 
   Chef::Log.info("cron_node: #{cron_node}")
   Chef::Log.info("hostname: #{node[:opsworks][:instance][:hostname]}")
-  if cron_node && cron_node[:hostname] == node[:opsworks][:instance][:hostname] # I'm special!
+  if cron_node == node[:opsworks][:instance][:hostname] # I'm special!
     Chef::Log.info("Assuming cron_node role")
     # cron
     execute 'bundle exec whenever -w' do
