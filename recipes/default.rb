@@ -4,12 +4,12 @@ node[:deploy].each do |application, deploy|
     next
   end
 
-  execute 'bundle binstubs whenever' do
+  execute 'bundle binstubs whenever railties' do
     user deploy[:user]
     group deploy[:group]
     environment(deploy[:environment])
     cwd deploy[:current_path]
-    command "#{deploy[:bundler_binary]} binstubs whenever"
+    command "#{deploy[:bundler_binary]} binstubs whenever railties"
   end
 
   execute 'bundle exec whenever -w' do
@@ -17,6 +17,6 @@ node[:deploy].each do |application, deploy|
     group deploy[:group]
     environment(deploy[:environment])
     cwd deploy[:current_path]
-    command "#{deploy[:bundler_binary]} exec whenever -w"
+    command "#{deploy[:bundler_binary]} exec whenever -w -s 'path=#{deploy[:current_path]}'"
   end
 end

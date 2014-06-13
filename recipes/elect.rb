@@ -17,12 +17,12 @@ node[:deploy].each do |application, deploy|
     Chef::Log.info("Elected #{cron_node} as cron_node")
   end
 
-  execute 'bundle binstubs whenever' do
+  execute 'bundle binstubs whenever railties' do
     user deploy[:user]
     group deploy[:group]
     environment(deploy[:environment])
     cwd deploy[:current_path]
-    command "#{deploy[:bundler_binary]} binstubs whenever"
+    command "#{deploy[:bundler_binary]} binstubs whenever railties"
   end
 
   Chef::Log.info("cron_node: #{cron_node}")
@@ -35,7 +35,7 @@ node[:deploy].each do |application, deploy|
       group deploy[:group]
       environment(deploy[:environment])
       cwd deploy[:current_path]
-      command "#{deploy[:bundler_binary]} exec whenever -w"
+      command "#{deploy[:bundler_binary]} exec whenever -w -s 'path=#{deploy[:current_path]}''"
     end
   else
     Chef::Log.info("Not the cron_node: Removing deploy's crontab")
