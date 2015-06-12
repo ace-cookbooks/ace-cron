@@ -4,6 +4,14 @@ node[:deploy].each do |application, deploy|
     next
   end
 
+  cookbook_file 'usr-local-bin.sh' do
+    path '/etc/profile.d/usr-local-bin.sh'
+    owner 'root'
+    group 'root'
+    mode '0644'
+    action :create
+  end
+
   execute 'bundle binstubs whenever railties' do
     user deploy[:user]
     group deploy[:group]
